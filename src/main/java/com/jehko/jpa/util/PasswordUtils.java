@@ -6,8 +6,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PasswordUtils {
-	// ÆĞ½º¿öµå ¾ÏÈ£È­ ¸®ÅÏ ÇÔ¼ö
-	// ÀÔ·ÂÇÑ ÆĞ½º¿öµå¸¦ ÇØ½ÃµÈ ÆĞ½º¿öµå¿Í ºñ±³
+	// íŒ¨ìŠ¤ì›Œë“œ ì•”í˜¸í™” ë¦¬í„´ í•¨ìˆ˜
+	// ì…ë ¥í•œ íŒ¨ìŠ¤ì›Œë“œë¥¼ í•´ì‹œëœ íŒ¨ìŠ¤ì›Œë“œì™€ ë¹„êµ
 	public static boolean equalPassword(String password, String encryptedPassword) {
 		return BCrypt.checkpw(password, encryptedPassword);
 	}

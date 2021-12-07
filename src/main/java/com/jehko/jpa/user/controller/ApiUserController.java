@@ -1,6 +1,8 @@
 package com.jehko.jpa.user.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,30 +62,6 @@ public class ApiUserController {
 	private final NoticeLikeRepository noticeLikeRepository;
 	private final MailService mailService;
 
-//	@PostMapping("/api/user")
-//	public ResponseEntity<?> addUser(@RequestBody @Valid UserInput userInput, Errors errors) {
-//		List<ResponseError> responseErrors = new ArrayList<>();
-//
-//		if (errors.hasErrors()) {
-//			errors.getAllErrors().forEach((e) -> {
-//				responseErrors.add(ResponseError.of((FieldError) e));
-//			});
-//
-//			return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-//		}
-//
-//		User user = User.builder()
-//				.email(userInput.getEmail())
-//				.userName(userInput.getUserName())
-//				.password(userInput.getPassword())
-//				.phone(userInput.getPhone())
-//				.regDate(LocalDateTime.now()).build();
-//
-//		userRepository.save(user);
-//
-//		return ResponseEntity.ok().build();
-//	}
-	
 	private String getEncryptPassword(String password) {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		return bCryptPasswordEncoder.encode(password);
@@ -102,7 +80,7 @@ public class ApiUserController {
 		}
 
 		if(userRepository.countByEmail(userInput.getEmail()) > 0) {
-			throw new ExistEmailException("ÀÌ¹Ì Á¸ÀçÇÏ´Â ÀÌ¸ŞÀÏÀÔ´Ï´Ù.");
+			throw new ExistEmailException("ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì´ë©”ì¼ì…ë‹ˆë‹¤.");
 		}
 
 		User user = User.builder()
@@ -131,7 +109,7 @@ public class ApiUserController {
 			return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
 		}
 
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 
 		user.setPhone(userUpdate.getPhone());
 		user.setUpdateDate(LocalDateTime.now());
@@ -143,13 +121,13 @@ public class ApiUserController {
 	
 	@GetMapping("/api/user/{id}")
 	public UserResponse getUser(@PathVariable Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		return UserResponse.of(user);
 	}
 	
 	@GetMapping("/api/user/{id}/notice")
 	public List<NoticeResponse> userNotice(@PathVariable Long id ) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù.")); 
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		
 		List<Notice> noticeList = noticeRepository.findByUser(user).get();
 		
@@ -175,7 +153,7 @@ public class ApiUserController {
 		}
 
 		User user = userRepository.findByIdAndPassword(id, userInputPassword.getPassword())
-				.orElseThrow(() -> new PasswordNotMatchException("ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù."));
+				.orElseThrow(() -> new PasswordNotMatchException("ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 		
 		user.setPassword(userInputPassword.getNewPassword());
 		user.setUpdateDate(LocalDateTime.now());
@@ -186,15 +164,15 @@ public class ApiUserController {
 
 	@DeleteMapping("/api/user/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 
 		try {
 			userRepository.delete(user);
 		} catch (DataIntegrityViolationException e) {
-			String message = "Á¦¾àÁ¶°Ç¿¡ ¹®Á¦°¡ ¹ß»ıÇß½À´Ï´Ù.";
+			String message = "ì œì•½ì¡°ê±´ì— ë¬¸ì œê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.";
 			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			String message = "È¸¿ø Å»Åğ Áß ¹®Á¦°¡ ¹ß»ıÇß½À´Ï´Ù.";
+			String message = "íšŒì› íƒˆí‡´ ì¤‘ ë¬¸ì œê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.";
 			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 		}
 
@@ -203,7 +181,7 @@ public class ApiUserController {
 	
 	@PatchMapping("/api/user/{id}/deleted")
 	public ResponseEntity<?> updateUserDeleted(@PathVariable Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 
 		user.setDeleted(true);
 		user.setUpdateDate(LocalDateTime.now());
@@ -216,7 +194,7 @@ public class ApiUserController {
 	@GetMapping("/api/user")
 	public ResponseEntity<?> findUser(@RequestBody UserInputFind userInputFind) {
 		User user = userRepository.findByUserNameAndPhone(userInputFind.getUserName(), userInputFind.getPhone())
-				.orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ°¡ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+				.orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		
 		UserResponse userResponse = UserResponse.of(user);
 		
@@ -225,16 +203,16 @@ public class ApiUserController {
 	
 	@GetMapping("/api/user/{id}/password/reset")
 	public ResponseEntity<?> resetUserPassword(@PathVariable Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		
-		// password ÃÊ±âÈ­
+		// password ï¿½Ê±ï¿½È­
 		String initPassword = getResetPassword();
 		user.setPassword(getEncryptPassword(initPassword));
 		user.setUpdateDate(LocalDateTime.now());
 		userRepository.save(user);
 		
-//		mailService.sendMail(user.getEmail(), "ÆĞ½º¿öµå ÃÊ±âÈ­ ¾È³»", "ÆĞ½º¿öµå°¡ " + initPassword + "·Î ÃÊ±âÈ­ µÇ¾ú½À´Ï´Ù.");
-		mailService.sendMail("jehko08@naver.com", "ÆĞ½º¿öµå ÃÊ±âÈ­ ¾È³»", "ÆĞ½º¿öµå°¡ " + initPassword + "·Î ÃÊ±âÈ­ µÇ¾ú½À´Ï´Ù.");
+//		mailService.sendMail(user.getEmail(), "ï¿½Ğ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½È³ï¿½", "ï¿½Ğ½ï¿½ï¿½ï¿½ï¿½å°¡ " + initPassword + "ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+		mailService.sendMail("jehko08@naver.com", "íŒ¨ìŠ¤ì›Œë“œ ì´ˆê¸°í™” ì•ˆë‚´", "íŒ¨ìŠ¤ì›Œë“œê°€ " + initPassword + "ë¡œ ì´ˆê¸°í™” ë˜ì—ˆìŠµë‹ˆë‹¤.");
 		
 		return ResponseEntity.ok().build();
 	}
@@ -245,7 +223,7 @@ public class ApiUserController {
 	
 	@GetMapping("/api/user/{id}/notice/like")
 	public List<NoticeLike> likeNotice(@PathVariable Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		
 		List<NoticeLike> noticeLikeList = noticeLikeRepository.findByUser(user);
 		return noticeLikeList;
@@ -264,13 +242,13 @@ public class ApiUserController {
 		}
 
 		User user = userRepository.findByEmail(userLogin.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("»ç¿ëÀÚ Á¤º¸°¡ ¾ø½À´Ï´Ù."));
+				.orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
 		
 		if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
-			throw new PasswordNotMatchException("ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù.");
+			throw new PasswordNotMatchException("ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 		}
 		
-		// ÅäÅ« ¸¸·á ÀÏÀÚ °è»ê - ÇöÀç ½Ã°£¿¡¼­ 1°³¿ù µÚ
+		// í† í° ë§Œë£Œ ì¼ì ê³„ì‚° - í˜„ì¬ ì‹œê°„ì—ì„œ 1ê°œì›” ë’¤
 		Date expiredDate = Timestamp.valueOf(LocalDateTime.now().plusMonths(1));
 		
 		String token = JWT.create()
@@ -285,8 +263,28 @@ public class ApiUserController {
 	
 	@PatchMapping("/api/user/login")
 	public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-		
-		return ResponseEntity.ok().build();
+
+		String token = request.getHeader("J_TOKEN");
+
+		String email = JWT.require(Algorithm.HMAC512("jehkojpa".getBytes()))
+				.build()
+				.verify(token)
+				.getIssuer();
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new UserNotFoundException("ì‚¬ìš©ì ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤."));
+
+		Date expiredDate = Timestamp.valueOf(LocalDateTime.now().plusMonths(1));
+
+
+		String newToken = JWT.create()
+				.withExpiresAt(expiredDate)
+				.withClaim("user_id", user.getId())
+				.withSubject(user.getUserName())
+				.withIssuer(user.getEmail())
+				.sign(Algorithm.HMAC512("jehkojpa".getBytes()));
+
+		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
 	}
 
 	

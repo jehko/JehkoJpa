@@ -15,18 +15,18 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserInput {
 
-	@Email(message = "ÀÌ¸ŞÀÏ Çü½Ä¿¡ ¸Â°Ô ÀÔ·ÂÇØÁÖ¼¼¿ä.")
-	@NotBlank(message = "ÀÌ¸ŞÀÏÀº ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Email(message = "ì´ë©”ì¼ í˜•ì‹ì— ë§ê²Œ ì…ë ¥í•´ì£¼ì„¸ìš”.")
+	@NotBlank(message = "ì´ë©”ì¼ì€ í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String email;
 
-	@NotBlank(message = "ÀÌ¸§Àº ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@NotBlank(message = "ì´ë¦„ì€ í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String userName;
 
-	@Size(min = 4, message = "ºñ¹Ğ¹øÈ£´Â ³×ÀÚ ÀÌ»ó ÀÔ·ÂÇØ¾ß ÇÕ´Ï´Ù.")
-	@NotBlank(message = "ºñ¹Ğ¹øÈ£´Â ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(min = 4, message = "ë¹„ë°€ë²ˆí˜¸ëŠ” ë„¤ì ì´ìƒ ì…ë ¥í•´ì•¼ í•©ë‹ˆë‹¤.")
+	@NotBlank(message = "ë¹„ë°€ë²ˆí˜¸ëŠ” í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String password;
 
-	@Size(max = 20, message = "¿¬¶ôÃ³´Â ÃÖ´ë 20ÀÚ±îÁö ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.")
-	@NotBlank(message = "¿¬¶ôÃ³´Â ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(max = 20, message = "ì—°ë½ì²˜ëŠ” ìµœëŒ€ 20ìê¹Œì§€ ì…ë ¥ ê°€ëŠ¥í•©ë‹ˆë‹¤.")
+	@NotBlank(message = "ì—°ë½ì²˜ëŠ” í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String phone;
 }

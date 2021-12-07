@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserInputPassword {
 
-	@NotBlank(message = "ÇöÀç ºñ¹Ğ¹øÈ£´Â ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@NotBlank(message = "í˜„ì¬ ë¹„ë°€ë²ˆí˜¸ëŠ” í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String password;
 
 
-	@Size(min = 4, max = 20, message = "½Å±Ô ºñ¹Ğ¹øÈ£´Â 4-20ÀÚ »çÀÌÀÇ ±æÀÌ·Î ÀÔ·ÂÇØÁÖ¼¼¿ä.")
-	@NotBlank(message = "½Å±Ô ºñ¹Ğ¹øÈ£´Â ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(min = 4, max = 20, message = "ì‹ ê·œ ë¹„ë°€ë²ˆí˜¸ëŠ” 4-20ì ì‚¬ì´ì˜ ê¸¸ì´ë¡œ ì…ë ¥í•´ì£¼ì„¸ìš”.")
+	@NotBlank(message = "ì‹ ê·œ ë¹„ë°€ë²ˆí˜¸ëŠ” í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String newPassword;
 }

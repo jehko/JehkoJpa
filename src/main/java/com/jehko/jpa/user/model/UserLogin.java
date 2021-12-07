@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserLogin {
 
-	@NotBlank(message = "ÀÌ¸ŞÀÏ Ç×¸ñÀº ÇÊ¼öÀÔ´Ï´Ù.")
+	@NotBlank(message = "ì´ë©”ì¼ í•­ëª©ì„ í•„ìˆ˜ì…ë‹ˆë‹¤.")
 	private String email;
 
-	@NotBlank(message = "ºñ¹Ğ¹øÈ£ Ç×¸ñÀº ÇÊ¼öÀÔ´Ï´Ù.")
+	@NotBlank(message = "ë¹„ë°€ë²ˆí˜¸ í•­ëª©ì„ í•„ìˆ˜ì…ë‹ˆë‹¤.")
 	private String password;
 }

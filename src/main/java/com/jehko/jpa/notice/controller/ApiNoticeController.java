@@ -41,99 +41,11 @@ public class ApiNoticeController {
 
 	private final NoticeRepository noticeRepository;
 
-//	@GetMapping("/api/notice")
-//	public NoticeModel notice() {
-//		NoticeModel notice = new NoticeModel();
-//
-//		notice.setId(1);
-//		notice.setTitle("°øÁö»çÇ×ÀÔ´Ï´Ù.");
-//		notice.setContents("°øÁö»çÇ× ³»¿ëÀÔ´Ï´Ù.");
-//		notice.setRegDate(LocalDateTime.of(2021, 2, 8, 0, 0));
-//
-//		return notice;
-//	}
-
-//	@GetMapping("/api/notice")
-//	public List<NoticeModel> notice() {
-//		List<NoticeModel> noticeList = new ArrayList<>();
-//		
-//		noticeList.add(NoticeModel.builder()
-//				.id(1)
-//				.title("°øÁö»çÇ×ÀÔ´Ï´Ù.")
-//				.contents("°øÁö»çÇ× ³»¿ëÀÔ´Ï´Ù.")
-//				.regDate(LocalDateTime.of(2021, 1, 30, 0, 0)).build());
-//		
-//		noticeList.add(NoticeModel.builder()
-//				.id(2)
-//				.title("µÎ¹øÂ° °øÁö»çÇ×ÀÔ´Ï´Ù..")
-//				.contents("µÎ¹øÀç °øÁö»çÇ× ³»¿ëÀÔ´Ï´Ù.")
-//				.regDate(LocalDateTime.of(2021, 2, 8, 0, 0)).build());
-//
-//		
-//		return noticeList;
-//	}
-
-//	@GetMapping("/api/notice")
-//	public List<NoticeModel> notice() {
-//		List<NoticeModel> noticeList = new ArrayList<>();
-//
-//		return noticeList;
-//	}
 
 	@GetMapping("/api/notice/count")
 	public int noticeCount() {
 		return 2;
 	}
-
-//	@PostMapping("/api/notice")
-//	public NoticeModel addNotice(String title, String contents) {
-//		NoticeModel notice = NoticeModel.builder().id(1).title(title).contents(contents).regDate(LocalDateTime.now())
-//				.build();
-//
-//		return notice;
-//
-//	}
-
-//	@PostMapping("/api/notice")
-//	public NoticeModel addNotice(NoticeModel noticeModel) {
-//		
-//		noticeModel.setId(2);
-//		noticeModel.setRegDate(LocalDateTime.now());
-//		
-//		return noticeModel;
-//		
-//	}
-
-//	@PostMapping("/api/notice")
-//	public NoticeModel addNotice(@RequestBody NoticeModel noticeModel) {
-//		
-//		noticeModel.setId(3);
-//		noticeModel.setRegDate(LocalDateTime.now());
-//		
-//		return noticeModel;
-//		
-//	}
-
-//	@PostMapping("/api/notice")
-//	public Notice addNotice(@RequestBody NoticeInput noticeInput) {
-//		
-//		Notice notice = Notice.builder()
-//				.title(noticeInput.getTitle())
-//				.contents(noticeInput.getContents())
-//				.regDate(LocalDateTime.now())
-//				.build();
-//		
-//		return noticeRepository.save(notice);
-//	}
-
-//	@PostMapping("/api/notice")
-//	public Notice addNotice(@RequestBody NoticeInput noticeInput) {
-//
-//		Notice notice = Notice.builder().title(noticeInput.getTitle()).contents(noticeInput.getContents())
-//				.regDate(LocalDateTime.now()).hits(0).likes(0).build();
-//
-//		return noticeRepository.save(notice);
-//	}
 
 	@GetMapping("/api/notice/{id}")
 	public Notice notice(@PathVariable Long id) {
@@ -149,7 +61,7 @@ public class ApiNoticeController {
 	public Notice updateNotice(@PathVariable Long id, @RequestBody NoticeInput noticeInput) {
 
 		Notice notice = noticeRepository.findById(id)
-				.orElseThrow(() -> new NoticeNotFoundException("°øÁö»çÇ×ÀÇ ±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."));
+				.orElseThrow(() -> new NoticeNotFoundException("ê³µì§€ì‚¬í•­ì˜ ê¸€ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 
 		notice.setTitle(noticeInput.getTitle());
 		notice.setContents(noticeInput.getContents());
@@ -161,32 +73,20 @@ public class ApiNoticeController {
 	@PatchMapping("/api/notice/{id}/hits")
 	public void noticeHits(@PathVariable Long id) {
 		Notice notice = noticeRepository.findById(id)
-				.orElseThrow(() -> new NoticeNotFoundException("°øÁö»çÇ×ÀÇ ±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."));
+				.orElseThrow(() -> new NoticeNotFoundException("ê³µì§€ì‚¬í•­ì˜ ê¸€ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 
 		notice.setHits(notice.getHits() + 1);
 		noticeRepository.save(notice);
 	}
 
-	/**
-	 * µ¥ÀÌÅÍ¸¦ »èÁ¦
-	 * 
-	 * @param id
-	 */
-//	@DeleteMapping("/api/notice/{id}")
-//	public void deleteNotice(@PathVariable Long id) {
-//		Notice notice = noticeRepository.findById(id)
-//				.orElseThrow(() -> new NoticeNotFoundException("°øÁö»çÇ×ÀÇ ±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."));
-//		
-//		noticeRepository.delete(notice);
-//	}
 
 	@DeleteMapping("/api/notice/{id}")
 	public void deleteNotice(@PathVariable Long id) {
 		Notice notice = noticeRepository.findById(id)
-				.orElseThrow(() -> new NoticeNotFoundException("°øÁö»çÇ×ÀÇ ±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."));
+				.orElseThrow(() -> new NoticeNotFoundException("ê³µì§€ì‚¬í•­ì˜ ê¸€ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 
 		if (notice.isDeleted()) {
-			throw new AlreadyDeletedException("ÀÌ¹Ì »èÁ¦µÈ ±ÛÀÔ´Ï´Ù.");
+			throw new AlreadyDeletedException("ì´ë¯¸ ì‚­ì œëœ ê¸€ì…ë‹ˆ.");
 		}
 
 		notice.setDeleted(true);
@@ -198,7 +98,7 @@ public class ApiNoticeController {
 	@DeleteMapping("/api/notice")
 	public void deleteNoticeList(@RequestBody NoticeDeleteInput noticeDeleteInput) {
 		List<Notice> noticeList = noticeRepository.findByIdIn(noticeDeleteInput.getIdList())
-				.orElseThrow(() -> new NoticeNotFoundException("°øÁö»çÇ×ÀÇ ±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."));
+				.orElseThrow(() -> new NoticeNotFoundException("ê³µì§€ì‚¬í•­ì˜ ê¸€ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."));
 
 		noticeList.stream().forEach(e -> {
 			e.setDeleted(true);
@@ -228,7 +128,7 @@ public class ApiNoticeController {
 
 	@PostMapping("/api/notice")
 	public ResponseEntity<Object> addNotice(@RequestBody @Valid NoticeInput noticeInput, Errors errors) {
-		// À¯È¿¼º Ã¼Å©
+		// ï¿½ï¿½È¿ï¿½ï¿½ Ã¼Å©
 		if (errors.hasErrors()) {
 			List<ResponseError> responseErrors = new ArrayList<>();
 			errors.getAllErrors().stream().forEach(e -> {
@@ -238,14 +138,14 @@ public class ApiNoticeController {
 			return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
 		}
 		
-		// Áßº¹ µî·Ï ¹æÁö
-		// ÇöÀç ½Ã°£ - 1ºĞ
+		// ï¿½ßºï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ - 1ï¿½ï¿½
 		LocalDateTime checkDate = LocalDateTime.now().minusMinutes(1);
-		// 1ºĞ ÀÌ³»¿¡ °°Àº Á¦¸ñ, °°Àº ³»¿ëÀ¸·Î µî·ÏµÈ °Ô½Ã±ÛÀÌ ÀÖ´ÂÁö È®ÀÎ
+		// 1ï¿½ï¿½ ï¿½Ì³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ïµï¿½ ï¿½Ô½Ã±ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 		int noticeCount = noticeRepository.countByTitleAndContentsAndRegDateIsGreaterThanEqual(
 				noticeInput.getTitle(), noticeInput.getContents(), checkDate);
 		if(noticeCount > 0) {
-			throw new DuplicateNoticeException("1ºĞ ÀÌ³»¿¡ µî·ÏµÈ µ¿ÀÏÇÑ °øÁö»çÇ×ÀÌ Á¸ÀçÇÕ´Ï´Ù.");
+			throw new DuplicateNoticeException("1ë¶„ ì´ë‚´ì— ë“±ë¡ëœ ë™ì¼í•œ ê³µì§€ì‚¬í•­ì´ ì¡´ì¬í•©ë‹ˆë‹¤.");
 		}
 
 		noticeRepository.save(Notice.builder()

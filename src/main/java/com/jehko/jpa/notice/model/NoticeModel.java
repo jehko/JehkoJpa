@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class NoticeModel {
 
-	// ID, Á¦¸ñ, ³»¿ë, µî·ÏÀÏ(ÀÛ¼ºÀÏ)
+	// ID, ì œëª©, ë‚´ìš©, ë“±ë¡ì¼(ì‘ì„±ì¼)
 	private int id;
 	private String title;
 	private String contents;

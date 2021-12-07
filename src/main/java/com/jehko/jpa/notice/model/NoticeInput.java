@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class NoticeInput {
 
-	@Size(min = 10, max = 100, message = "Á¦¸ñÀº 10-100ÀÚ ÀÌ»óÀÔ´Ï´Ù.")
-	@NotBlank(message = "Á¦¸ñÀº ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(min = 10, max = 100, message = "ì œëª©ì€ 10-100ì ì´ë‚´ì…ë‹ˆë‹¤.")
+	@NotBlank(message = "ì œëª©ì„ í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String title;
 
-	@Size(min = 50, max = 1000, message = "³»¿ëÀº 50-1000ÀÚ ÀÌ»óÀÔ´Ï´Ù.")
-	@NotBlank(message = "³»¿ëÀº ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(min = 50, max = 1000, message = "ë‚´ìš©ì€ 50-1000ì ì´ë‚´ì…ë‹ˆë‹¤.")
+	@NotBlank(message = "ë‚´ìš©ì€ í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String contents;
 }

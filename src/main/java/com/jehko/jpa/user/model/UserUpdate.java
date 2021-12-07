@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserUpdate {
 	
-	@Size(max = 20, message = "¿¬¶ôÃ³´Â ÃÖ´ë 20ÀÚ±îÁö ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.")
-	@NotBlank(message = "¿¬¶ôÃ³´Â ÇÊ¼ö Ç×¸ñÀÔ´Ï´Ù.")
+	@Size(max = 20, message = "ì—°ë½ì²˜ëŠ” ìµœëŒ€ 20ìê¹Œì§€ ì…ë ¥ ê°€ëŠ¥í•©ë‹ˆë‹¤.")
+	@NotBlank(message = "ì—°ë½ì²˜ëŠ” í•„ìˆ˜ í•­ëª©ì…ë‹ˆë‹¤.")
 	private String phone;
 }
