@@ -12,21 +12,15 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.jehko.jpa.util.JWTUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -211,7 +205,7 @@ public class ApiUserController {
 		user.setUpdateDate(LocalDateTime.now());
 		userRepository.save(user);
 		
-//		mailService.sendMail(user.getEmail(), "�н����� �ʱ�ȭ �ȳ�", "�н����尡 " + initPassword + "�� �ʱ�ȭ �Ǿ����ϴ�.");
+//		mailService.sendMail(user.getEmail(), "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
 		mailService.sendMail("jehko08@naver.com", "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
 		
 		return ResponseEntity.ok().build();
@@ -247,48 +241,53 @@ public class ApiUserController {
 		if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
 			throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
 		}
-		
-		// 토큰 만료 일자 계산 - 현재 시간에서 1개월 뒤
-		Date expiredDate = Timestamp.valueOf(LocalDateTime.now().plusMonths(1));
-		
-		String token = JWT.create()
-			.withExpiresAt(expiredDate)
-			.withClaim("user_id", user.getId())
-			.withSubject(user.getUserName())
-			.withIssuer(user.getEmail())
-			.sign(Algorithm.HMAC512("jehkojpa".getBytes()));
+
+		String token = JWTUtils.createToken(user);
 		
 		return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
 	}
 	
 	@PatchMapping("/api/user/login")
-	public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+	public ResponseEntity<?> refreshToken(@RequestHeader("J_TOKEN") String token) {
+		String email = "";
 
-		String token = request.getHeader("J_TOKEN");
-
-		String email = JWT.require(Algorithm.HMAC512("jehkojpa".getBytes()))
-				.build()
-				.verify(token)
-				.getIssuer();
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch (SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
 
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
 
-		Date expiredDate = Timestamp.valueOf(LocalDateTime.now().plusMonths(1));
-
-
-		String newToken = JWT.create()
-				.withExpiresAt(expiredDate)
-				.withClaim("user_id", user.getId())
-				.withSubject(user.getUserName())
-				.withIssuer(user.getEmail())
-				.sign(Algorithm.HMAC512("jehkojpa".getBytes()));
+		String newToken = JWTUtils.createToken(user);
 
 		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
 	}
 
-	
-	
+	@DeleteMapping("/api/user/login")
+	public ResponseEntity<?> removeToken(@RequestHeader("J_TOKEN") String token) {
+
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+
+		return ResponseEntity.ok().build();
+	}
+
+
 	@ExceptionHandler(value = { ExistEmailException.class, PasswordNotMatchException.class,
 			UserNotFoundException.class })
 	public ResponseEntity<String> RuntimeExceptionHandler(RuntimeException exception) {
