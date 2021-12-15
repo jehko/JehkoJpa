@@ -33,6 +33,7 @@ import com.jehko.jpa.notice.model.NoticeInput;
 import com.jehko.jpa.notice.model.ResponseError;
 import com.jehko.jpa.notice.repository.NoticeRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -41,12 +42,7 @@ public class ApiNoticeController {
 
 	private final NoticeRepository noticeRepository;
 
-
-	@GetMapping("/api/notice/count")
-	public int noticeCount() {
-		return 2;
-	}
-
+	@Operation(summary = "test", description="swagger test")
 	@GetMapping("/api/notice/{id}")
 	public Notice notice(@PathVariable Long id) {
 		Optional<Notice> notice = noticeRepository.findById(id);

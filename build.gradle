@@ -33,6 +33,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-devtools:2.0.1.RELEASE")
 	
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("io.springfox:springfox-boot-starter:3.0.0")
 	
 	implementation group: 'com.auth0', name: 'java-jwt', version: '3.18.2'
 	
