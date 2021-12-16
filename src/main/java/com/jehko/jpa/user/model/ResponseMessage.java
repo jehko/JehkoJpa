@@ -32,7 +32,6 @@ public class ResponseMessage {
     }
 
     public static ResponseMessage success(Object object) {
-
         return ResponseMessage.builder()
                 .header(ResponseMessageHeader.builder()
                         .result(true)
@@ -41,6 +40,18 @@ public class ResponseMessage {
                         .status(HttpStatus.OK.value())
                         .build())
                 .data(object)
+                .build();
+    }
+
+    public static ResponseMessage success() {
+        return ResponseMessage.builder()
+                .header(ResponseMessageHeader.builder()
+                        .result(true)
+                        .resultCode("")
+                        .message("")
+                        .status(HttpStatus.OK.value())
+                        .build())
+                .data(null)
                 .build();
     }
 }
