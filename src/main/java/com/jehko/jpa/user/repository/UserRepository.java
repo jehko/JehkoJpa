@@ -3,6 +3,7 @@ package com.jehko.jpa.user.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.jehko.jpa.user.model.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByEmail(String email);
 
 	List<User> findByEmailContainsOrPhoneContainsOrUserNameContains(String email, String phone, String userName);
-
+	long countByStatus(UserStatus userStatus);
 }

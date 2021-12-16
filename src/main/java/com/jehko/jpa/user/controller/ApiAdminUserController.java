@@ -6,12 +6,10 @@ import com.jehko.jpa.user.entity.UserLoginHistory;
 import com.jehko.jpa.user.exception.ExistEmailException;
 import com.jehko.jpa.user.exception.PasswordNotMatchException;
 import com.jehko.jpa.user.exception.UserNotFoundException;
-import com.jehko.jpa.user.model.ResponseMessage;
-import com.jehko.jpa.user.model.UserSearch;
-import com.jehko.jpa.user.model.UserStatus;
-import com.jehko.jpa.user.model.UserStatusInput;
+import com.jehko.jpa.user.model.*;
 import com.jehko.jpa.user.repository.UserLoginHistoryRepository;
 import com.jehko.jpa.user.repository.UserRepository;
+import com.jehko.jpa.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -28,6 +26,8 @@ public class ApiAdminUserController {
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
     private final UserLoginHistoryRepository userLoginHistoryRepository;
+
+    private final UserService userService;
 
 //	@GetMapping("/api/admin/user")
 //	public ResponseMessage userList() {
@@ -137,6 +137,14 @@ public class ApiAdminUserController {
 
         return ResponseEntity.ok().body(ResponseMessage.success());
     }
+
+    @GetMapping("/api/admin/user/status/count")
+    public ResponseEntity<?> userStatusCount() {
+        UserSummary userSummary = userService.getUserStatusCount();
+        return ResponseEntity.ok().body(ResponseMessage.success(userSummary));
+    }
+
+
     @ExceptionHandler(value = {ExistEmailException.class, PasswordNotMatchException.class,
             UserNotFoundException.class})
     public ResponseEntity<String> RuntimeExceptionHandler(RuntimeException exception) {
