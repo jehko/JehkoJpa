@@ -144,6 +144,20 @@ public class ApiAdminUserController {
         return ResponseEntity.ok().body(ResponseMessage.success(userSummary));
     }
 
+    @GetMapping("/api/admin/user/today")
+    public ResponseEntity<?> todayUser() {
+        List<User> users = userService.getTodayUsers();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(users));
+    }
+
+    @GetMapping("/api/admin/user/notice/count")
+    public ResponseEntity<?> userNoticeCount() {
+        List<UserNoticeCount> userNoticeCountList = userService.getUserNoticeCount();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(userNoticeCountList));
+    }
+
 
     @ExceptionHandler(value = {ExistEmailException.class, PasswordNotMatchException.class,
             UserNotFoundException.class})
