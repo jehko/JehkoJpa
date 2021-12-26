@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserNoticeCount {
+public class UserNoticeLogCount {
     private long id;
     private String email;
     private String userName;
     private long noticeCount;
+    private long noticeLikeCount;
 }

@@ -27,7 +27,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query("select u from User u where u.regDate between :startDate and :endDate")
 	List<User> findTodayRegUser(LocalDateTime startDate, LocalDateTime endDate);
-
-	@Query(value = "select u.email, u.userName from User u")
-	List<UserNoticeCount> findUserNoticeCount();
 }

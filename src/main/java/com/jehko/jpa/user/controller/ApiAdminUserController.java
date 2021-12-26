@@ -11,7 +11,7 @@ import com.jehko.jpa.user.repository.UserLoginHistoryRepository;
 import com.jehko.jpa.user.repository.UserRepository;
 import com.jehko.jpa.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ApiAdminUserController {
@@ -158,6 +159,23 @@ public class ApiAdminUserController {
         return ResponseEntity.ok().body(ResponseMessage.success(userNoticeCountList));
     }
 
+    @GetMapping("/api/admin/user/notice/logcount")
+    public ResponseEntity<?> userNoticeLogCount() {
+        List<UserNoticeLogCount> userNoticeLogCountList = userService.getUserNoticeLogCount();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(userNoticeLogCountList));
+    }
+
+    /**
+     * 좋아요를 가장 많이 누른 사용자 순서
+     * @return
+     */
+    @GetMapping("/api/admin/user/notice/like/best")
+    public ResponseEntity<?> userUserNoticeLikeBest() {
+        List<UserNoticeLogCount> userNoticeLikeBest = userService.getNoticeLikeBest();
+
+        return ResponseEntity.ok().body(ResponseMessage.success(userNoticeLikeBest));
+    }
 
     @ExceptionHandler(value = {ExistEmailException.class, PasswordNotMatchException.class,
             UserNotFoundException.class})
