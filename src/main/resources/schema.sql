@@ -61,3 +61,17 @@ create table BOARD_TYPE
     REG_DATE	TIMESTAMP,
     UPDATE_DATE	TIMESTAMP
 );
+
+create table BOARD
+(
+    ID      BIGINT  auto_increment primary key,
+    TITLE	VARCHAR(255),
+    CONTENTS	VARCHAR(255),
+    BOARD_TYPE_ID   BIGINT,
+    USER_ID   BIGINT,
+    REG_DATE	TIMESTAMP,
+    UPDATE_DATE	TIMESTAMP,
+
+	constraint FK_BOARD_BOARD_TYPE_ID foreign key(BOARD_TYPE_ID) references BOARD_TYPE(ID),
+	constraint FK_BOARD_USER_ID foreign key(USER_ID) references USER(ID)
+);

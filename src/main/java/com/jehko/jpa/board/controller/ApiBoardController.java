@@ -6,6 +6,7 @@ import com.jehko.jpa.board.service.BoardService;
 import com.jehko.jpa.notice.model.ResponseError;
 import com.jehko.jpa.user.model.ResponseMessage;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -47,6 +48,17 @@ public class ApiBoardController {
 		}
 
 		ServiceResult result = boardService.updateBoard(id, boardTypeInput);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@DeleteMapping("/api/board/type/{id}")
+	public ResponseEntity<?> deleteBoardType(@PathVariable Long id) {
+		ServiceResult result = boardService.deleteBoard(id);
 
 		if (!result.isResult()) {
 			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
