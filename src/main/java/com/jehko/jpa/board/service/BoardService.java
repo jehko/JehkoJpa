@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,12 +45,16 @@ public class BoardService {
             return ServiceResult.fail("존재하지 않는 게시판입니다.");
         }
 
-        BoardType boardType = optionalBoardType.get();
-        // to-do 전체 게시판 목록에서 동일한 게시판 명이 존재하는지 확인
-        if(boardTypeInput.getName().equals(boardType.getBoardName())) {
+        List<BoardType> boardTypeList = boardTypeRepository.findAll();
+        List<BoardType> sameBoardTypeList = boardTypeList.stream().filter((e) -> {
+            return e.getBoardName().equals(boardTypeInput.getName());
+        }).collect(Collectors.toList());
+
+        if(sameBoardTypeList != null && sameBoardTypeList.size() > 0) {
             return ServiceResult.fail("이미 동일한 게시판이 존재합니다.");
         }
 
+        BoardType boardType = optionalBoardType.get();
         boardType.setBoardName(boardTypeInput.getName());
         boardType.setUpdateDate(LocalDateTime.now());
         boardTypeRepository.save(boardType);
