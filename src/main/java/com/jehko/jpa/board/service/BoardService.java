@@ -45,16 +45,17 @@ public class BoardService {
             return ServiceResult.fail("존재하지 않는 게시판입니다.");
         }
 
-        List<BoardType> boardTypeList = boardTypeRepository.findAll();
-        List<BoardType> sameBoardTypeList = boardTypeList.stream().filter((e) -> {
-            return e.getBoardName().equals(boardTypeInput.getName());
-        }).collect(Collectors.toList());
+        BoardType sameBoardType = boardTypeRepository.findByBoardName(boardTypeInput.getName());
+        BoardType boardType = optionalBoardType.get();
 
-        if(sameBoardTypeList != null && sameBoardTypeList.size() > 0) {
-            return ServiceResult.fail("이미 동일한 게시판이 존재합니다.");
+        if(sameBoardType != null) {
+            String message = "이미 동일한 게시판이 존재합니다.";
+            if(sameBoardType.getBoardName().equals(boardType.getBoardName())) {
+                message = "게시판 이름이 동일합니다.";
+            }
+            return ServiceResult.fail(message);
         }
 
-        BoardType boardType = optionalBoardType.get();
         boardType.setBoardName(boardTypeInput.getName());
         boardType.setUpdateDate(LocalDateTime.now());
         boardTypeRepository.save(boardType);
