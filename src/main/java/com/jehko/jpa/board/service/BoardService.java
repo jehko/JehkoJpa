@@ -1,14 +1,18 @@
 package com.jehko.jpa.board.service;
 
 import com.jehko.jpa.board.entity.BoardType;
+import com.jehko.jpa.board.model.BoardTypeCount;
 import com.jehko.jpa.board.model.BoardTypeInput;
+import com.jehko.jpa.board.model.BoardTypeUsing;
 import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.board.repository.BoardCustomRepository;
 import com.jehko.jpa.board.repository.BoardRepository;
 import com.jehko.jpa.board.repository.BoardTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +21,7 @@ public class BoardService {
 
     private final BoardTypeRepository boardTypeRepository;
     private final BoardRepository boardRepository;
+    private final BoardCustomRepository boardCustomRepository;
 
     BoardType getByName(String boardName) {
         return null;
@@ -79,5 +84,28 @@ public class BoardService {
         boardTypeRepository.delete(boardType);
 
         return ServiceResult.success();
+    }
+
+    public List<BoardType> getAllBoardType() {
+        return boardTypeRepository.findAll();
+    }
+
+    public ServiceResult setBoardTypeUsing(Long id, BoardTypeUsing boardTypeUsing) {
+        Optional<BoardType> optionalBoardType = boardTypeRepository.findById(id);
+
+        if(!optionalBoardType.isPresent()) {
+            return ServiceResult.fail("존재하지 않는 게시판입니다.");
+        }
+
+        BoardType boardType = optionalBoardType.get();
+
+        boardType.setUsingYn(boardTypeUsing.isUsingYn());
+        boardTypeRepository.save(boardType);
+
+        return ServiceResult.success();
+    }
+
+    public List<BoardTypeCount> getBoardTypeCount() {
+        return boardCustomRepository.findBoardTypeCount();
     }
 }
