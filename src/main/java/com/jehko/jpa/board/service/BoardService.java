@@ -1,10 +1,8 @@
 package com.jehko.jpa.board.service;
 
+import com.jehko.jpa.board.entity.Board;
 import com.jehko.jpa.board.entity.BoardType;
-import com.jehko.jpa.board.model.BoardTypeCount;
-import com.jehko.jpa.board.model.BoardTypeInput;
-import com.jehko.jpa.board.model.BoardTypeUsing;
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.repository.BoardCustomRepository;
 import com.jehko.jpa.board.repository.BoardRepository;
 import com.jehko.jpa.board.repository.BoardTypeRepository;
@@ -107,5 +105,41 @@ public class BoardService {
 
     public List<BoardTypeCount> getBoardTypeCount() {
         return boardCustomRepository.findBoardTypeCount();
+    }
+
+    public ServiceResult setBoardTop(Long id, BoardTopInput boardTopInput) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        if(board.isTopYn() == boardTopInput.isTopYn()) {
+            if(boardTopInput.isTopYn()) {
+                return ServiceResult.fail("이미 게시글이 최상단에 배치되어 있습니다.");
+            } else {
+                return ServiceResult.fail("이미 게시글이 최상단 배치가 해제되어 있습니다.");
+            }
+        }
+
+        board.setTopYn(boardTopInput.isTopYn());
+        boardRepository.save(board);
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult setBoardPeriod(Long id, BoardPeriod boardPeriod) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        board.setPublishStartDate(boardPeriod.getStartDate());
+        board.setPublishEndDate(boardPeriod.getEndDate());
+
+        boardRepository.save(board);
+
+        return ServiceResult.success();
     }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Board {
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,4 +41,13 @@ public class Board {
 
 	@Column
 	private LocalDateTime updateDate;
+
+	@Column
+	private boolean topYn;
+
+	@Column
+	private LocalDate publishStartDate;
+
+	@Column
+	private LocalDate publishEndDate;
 }

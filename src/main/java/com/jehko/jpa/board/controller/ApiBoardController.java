@@ -1,10 +1,7 @@
 package com.jehko.jpa.board.controller;
 
 import com.jehko.jpa.board.entity.BoardType;
-import com.jehko.jpa.board.model.BoardTypeCount;
-import com.jehko.jpa.board.model.BoardTypeInput;
-import com.jehko.jpa.board.model.BoardTypeUsing;
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.service.BoardService;
 import com.jehko.jpa.notice.model.ResponseError;
 import com.jehko.jpa.user.model.ResponseMessage;
@@ -93,5 +90,27 @@ public class ApiBoardController {
 		List<BoardTypeCount> boardTypeCountList = boardService.getBoardTypeCount();
 
 		return ResponseEntity.ok().body(ResponseMessage.success(boardTypeCountList));
+	}
+
+	@PatchMapping("/api/board/{id}/top")
+	public ResponseEntity<?> boardPostTop(@PathVariable Long id, @RequestBody BoardTopInput boardTopInput) {
+		ServiceResult result = boardService.setBoardTop(id, boardTopInput);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@PatchMapping("/api/board/{id}/publish")
+	public ResponseEntity<?> boardPeriod(@PathVariable Long id, @RequestBody BoardPeriod boardPeriod) {
+		ServiceResult result = boardService.setBoardPeriod(id, boardPeriod);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
 	}
 }
