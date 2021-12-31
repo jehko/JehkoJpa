@@ -1,10 +1,12 @@
 package com.jehko.jpa.board.controller;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.jehko.jpa.board.entity.BoardType;
 import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.service.BoardService;
 import com.jehko.jpa.notice.model.ResponseError;
 import com.jehko.jpa.user.model.ResponseMessage;
+import com.jehko.jpa.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -113,4 +115,85 @@ public class ApiBoardController {
 
 		return ResponseEntity.ok().body(ResponseMessage.success());
 	}
+
+	@PutMapping("/api/board/{id}/hits")
+	public ResponseEntity<?> boardHits(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.setBoardHits(id, email);
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@PutMapping("/api/board/{id}/like")
+	public ResponseEntity<?> boardLike(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.setBoardLike(id, email);
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@PutMapping("/api/board/{id}/unlike")
+	public ResponseEntity<?> boardUnlike(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.setBoardUnlike(id, email);
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@PutMapping("/api/board/{id}/badreport")
+	public ResponseEntity<?> boardBadReport(@PathVariable Long id, @RequestHeader("J_TOKEN") String token, @RequestBody BoardBadReportInput boardBadReportInput) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.addBadReport(id, email, boardBadReportInput);
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
 }

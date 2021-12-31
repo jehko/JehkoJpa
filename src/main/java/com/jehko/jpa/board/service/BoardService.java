@@ -1,15 +1,16 @@
 package com.jehko.jpa.board.service;
 
-import com.jehko.jpa.board.entity.Board;
-import com.jehko.jpa.board.entity.BoardType;
+import com.jehko.jpa.board.entity.*;
 import com.jehko.jpa.board.model.*;
-import com.jehko.jpa.board.repository.BoardCustomRepository;
-import com.jehko.jpa.board.repository.BoardRepository;
-import com.jehko.jpa.board.repository.BoardTypeRepository;
+import com.jehko.jpa.board.repository.*;
+import com.jehko.jpa.user.entity.User;
+import com.jehko.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Array;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,10 @@ public class BoardService {
     private final BoardTypeRepository boardTypeRepository;
     private final BoardRepository boardRepository;
     private final BoardCustomRepository boardCustomRepository;
+    private final BoardHitsRepository boardHitsRepository;
+    private final BoardLikeRepository boardLikeRepository;
+    private final BoardBadReportRepository boardBadReportRepository;
+    private final UserRepository userRepository;
 
     BoardType getByName(String boardName) {
         return null;
@@ -141,5 +146,121 @@ public class BoardService {
         boardRepository.save(board);
 
         return ServiceResult.success();
+    }
+
+    public ServiceResult setBoardHits(Long id, String email) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        if(boardHitsRepository.countByBoardAndUser(board, user) > 0) {
+            return ServiceResult.fail("이미 조회수가 있습니다.");
+        }
+
+        boardHitsRepository.save(BoardHits.builder()
+                .board(board)
+                .user(user)
+                .regDate(LocalDateTime.now())
+                .build());
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult setBoardLike(Long id, String email) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        if(boardLikeRepository.countByBoardAndUser(board, user) > 0) {
+            return ServiceResult.fail("이미 조회수가 있습니다.");
+        }
+
+        boardLikeRepository.save(BoardLike.builder()
+                .board(board)
+                .user(user)
+                .regDate(LocalDateTime.now())
+                .build());
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult setBoardUnlike(Long id, String email) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        Optional<BoardLike> boardLike = boardLikeRepository.findByBoardAndUser(board, user);
+        if(!boardLike.isPresent()) {
+            return ServiceResult.fail("좋아요한 내용이 없습니다.");
+        }
+
+        boardLikeRepository.delete(boardLike.get());
+        return ServiceResult.success();
+    }
+
+    public ServiceResult addBadReport(Long id, String email, BoardBadReportInput boardBadReportInput) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        if(boardBadReportRepository.countByUserAndBoardId(user, board.getId()) > 0) {
+            return ServiceResult.fail("이미 신고한 게시글입니다.");
+        }
+
+        BoardBadReport boardBadReport = BoardBadReport.builder()
+                .user(user)
+                .boardId(board.getId())
+                .boardUserId(board.getUser().getId())
+                .boardTitle(board.getTitle())
+                .boardContents(board.getContents())
+                .boardRegDate(board.getRegDate())
+                .comments(boardBadReportInput.getComments())
+                .regDate(LocalDateTime.now())
+                .build();
+
+        boardBadReportRepository.save(boardBadReport);
+
+        return ServiceResult.success();
+    }
+
+    public List<BoardBadReportResponse> badReportList() {
+        List<BoardBadReport> badReportList = boardBadReportRepository.findAll();
+        List<BoardBadReportResponse> resultList = new ArrayList<BoardBadReportResponse>();
+        badReportList.stream().forEach(e -> {
+            resultList.add(BoardBadReportResponse.of(e));
+        });
+        return resultList;
     }
 }

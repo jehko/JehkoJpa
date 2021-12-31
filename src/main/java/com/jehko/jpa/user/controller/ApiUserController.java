@@ -1,29 +1,6 @@
 package com.jehko.jpa.user.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.jehko.jpa.util.JWTUtils;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.jehko.jpa.notice.entity.Notice;
 import com.jehko.jpa.notice.entity.NoticeLike;
 import com.jehko.jpa.notice.model.NoticeResponse;
@@ -34,18 +11,25 @@ import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.exception.ExistEmailException;
 import com.jehko.jpa.user.exception.PasswordNotMatchException;
 import com.jehko.jpa.user.exception.UserNotFoundException;
-import com.jehko.jpa.user.model.UserInput;
-import com.jehko.jpa.user.model.UserInputFind;
-import com.jehko.jpa.user.model.UserInputPassword;
-import com.jehko.jpa.user.model.UserLogin;
-import com.jehko.jpa.user.model.UserLoginToken;
-import com.jehko.jpa.user.model.UserResponse;
-import com.jehko.jpa.user.model.UserUpdate;
+import com.jehko.jpa.user.model.*;
 import com.jehko.jpa.user.repository.UserRepository;
+import com.jehko.jpa.util.JWTUtils;
 import com.jehko.jpa.util.MailService;
 import com.jehko.jpa.util.PasswordUtils;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
