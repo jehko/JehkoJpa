@@ -24,6 +24,7 @@ public class BoardService {
     private final BoardHitsRepository boardHitsRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardBadReportRepository boardBadReportRepository;
+    private final BoardScrapRepository boardScrapRepository;
     private final UserRepository userRepository;
 
     BoardType getByName(String boardName) {
@@ -257,10 +258,78 @@ public class BoardService {
 
     public List<BoardBadReportResponse> badReportList() {
         List<BoardBadReport> badReportList = boardBadReportRepository.findAll();
-        List<BoardBadReportResponse> resultList = new ArrayList<BoardBadReportResponse>();
+        List<BoardBadReportResponse> resultList = new ArrayList<>();
         badReportList.stream().forEach(e -> {
             resultList.add(BoardBadReportResponse.of(e));
         });
         return resultList;
+    }
+
+    public ServiceResult boardScrapList(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        User user = optionalUser.get();
+
+        List<BoardScrap> boardScrapList = boardScrapRepository.findByUser(user);
+        List<BoardScrapResponse> resultList = new ArrayList<>();
+
+        boardScrapList.stream().forEach(e -> {
+            resultList.add(BoardScrapResponse.of(e));
+        });
+
+        return ServiceResult.success(resultList);
+    }
+
+    public ServiceResult scrapBoard(Long id, String email) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        if(boardScrapRepository.countByBoardAndUser(board, user) > 0) {
+            return ServiceResult.fail("이미 스크랩한 게시글입니다.");
+        }
+
+        boardScrapRepository.save(BoardScrap.builder()
+                .board(board)
+                .user(user)
+                .regDate(LocalDateTime.now())
+                .build());
+
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult removeScrap(Long id, String email) {
+        Optional<BoardScrap> optionalBoardScrap = boardScrapRepository.findById(id);
+        if(!optionalBoardScrap.isPresent()) {
+            return ServiceResult.fail("스크랩 내역이 존재하지 않습니다.");
+        }
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        BoardScrap boardScrap = optionalBoardScrap.get();
+        User user = optionalUser.get();
+
+        if(boardScrap.getUser().getId() != user.getId()) {
+            return ServiceResult.fail("사용자가 스크랩한 글이 아닙니다.");
+        }
+
+        boardScrapRepository.delete(boardScrap);
+
+        return ServiceResult.success();
     }
 }

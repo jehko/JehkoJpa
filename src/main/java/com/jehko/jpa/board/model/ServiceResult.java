@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ServiceResult {
     private boolean result;
     private String message;
+    private Object data;
 
     public static ServiceResult fail(String message) {
         return ServiceResult.builder()
@@ -23,6 +24,13 @@ public class ServiceResult {
     public static ServiceResult success() {
         return ServiceResult.builder()
                 .result(true)
+                .build();
+    }
+
+    public static ServiceResult success(Object data) {
+        return ServiceResult.builder()
+                .result(true)
+                .data(data)
                 .build();
     }
 }
