@@ -1,6 +1,8 @@
 package com.jehko.jpa.user.controller;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.board.service.BoardService;
 import com.jehko.jpa.notice.entity.Notice;
 import com.jehko.jpa.notice.entity.NoticeLike;
 import com.jehko.jpa.notice.model.NoticeResponse;
@@ -13,6 +15,8 @@ import com.jehko.jpa.user.exception.PasswordNotMatchException;
 import com.jehko.jpa.user.exception.UserNotFoundException;
 import com.jehko.jpa.user.model.*;
 import com.jehko.jpa.user.repository.UserRepository;
+import com.jehko.jpa.user.service.PointService;
+import com.jehko.jpa.user.service.UserService;
 import com.jehko.jpa.util.JWTUtils;
 import com.jehko.jpa.util.MailService;
 import com.jehko.jpa.util.PasswordUtils;
@@ -39,6 +43,9 @@ public class ApiUserController {
 	private final NoticeRepository noticeRepository;
 	private final NoticeLikeRepository noticeLikeRepository;
 	private final MailService mailService;
+	private final UserService userService;
+	private final BoardService boardService;
+	private final PointService pointService;
 
 	private String getEncryptPassword(String password) {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -271,6 +278,110 @@ public class ApiUserController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PutMapping("/api/user/{id}/interest")
+	public ResponseEntity<?> interestUser(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = userService.addInterestUser(id, email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@DeleteMapping("/api/user/{id}/interest")
+	public ResponseEntity<?> removeInterestUser(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = userService.removeInterestUser(id, email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@GetMapping("/api/user/board/mypost")
+	public ResponseEntity<?> myPost(@RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.postList(email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success(result));
+	}
+
+	@GetMapping("/api/user/board/mycomment")
+	public ResponseEntity<?> myComment(@RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.commentList(email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success(result));
+	}
+
+	@PostMapping("/api/user/point")
+	public ResponseEntity<?> userPoint(@RequestHeader("J_TOKEN") String token, @RequestBody UserPointInput userPointInput) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = pointService.addPoint(email, userPointInput);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
 
 	@ExceptionHandler(value = { ExistEmailException.class, PasswordNotMatchException.class,
 			UserNotFoundException.class })

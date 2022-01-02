@@ -54,6 +54,27 @@ create table USER_LOGIN_HISTORY
     LOGIN_DATE	TIMESTAMP
 );
 
+create table USER_INTEREST
+(
+    ID      BIGINT  auto_increment primary key,
+    USER_ID     BIGINT,
+    INTEREST_USER_ID     BIGINT,
+    REG_DATE    TIMESTAMP,
+
+	constraint FK_USER_INTEREST_USER_ID foreign key(USER_ID) references USER(ID),
+	constraint FK_USER_INTEREST_INTEREST_USER_ID foreign key(INTEREST_USER_ID) references USER(ID)
+);
+
+create table USER_POINT
+(
+    ID                  BIGINT auto_increment primary key,
+    USER_ID             BIGINT,
+    USER_POINT_TYPE     VARCHAR(255),
+    POINT               BIGINT,
+
+	constraint FK_USER_POINT_USER_ID foreign key(USER_ID) references USER(ID)
+);
+
 create table BOARD_TYPE
 (
     ID      BIGINT  auto_increment primary key,
@@ -79,6 +100,19 @@ create table BOARD
 
 	constraint FK_BOARD_BOARD_TYPE_ID foreign key(BOARD_TYPE_ID) references BOARD_TYPE(ID),
 	constraint FK_BOARD_USER_ID foreign key(USER_ID) references USER(ID)
+);
+
+create table BOARD_COMMENT
+(
+    ID      BIGINT  auto_increment primary key,
+    COMMENTS	VARCHAR(255),
+    BOARD_ID   BIGINT,
+    USER_ID   BIGINT,
+    REG_DATE	TIMESTAMP,
+    UPDATE_DATE	TIMESTAMP,
+
+	constraint FK_BOARD_COMMENT_USER_ID foreign key(USER_ID) references USER(ID),
+	constraint FK_BOARD_COMMENT_BOARD_ID foreign key(BOARD_ID) references BOARD(ID)
 );
 
 create table BOARD_HITS
@@ -129,4 +163,15 @@ create table BOARD_SCRAP
 
 	constraint FK_BOARD_SCRAP_BOARD_ID foreign key(BOARD_ID) references BOARD(ID),
 	constraint FK_BOARD_SCRAP_USER_ID foreign key(USER_ID) references USER(ID)
+);
+
+create table BOARD_BOOKMARK
+(
+    ID      BIGINT  auto_increment primary key,
+    BOARD_ID   BIGINT,
+    USER_ID   BIGINT,
+    REG_DATE	TIMESTAMP,
+
+	constraint FK_BOARD_BOOKMARK_BOARD_ID foreign key(BOARD_ID) references BOARD(ID),
+	constraint FK_BOARD_BOOKMARK_USER_ID foreign key(USER_ID) references USER(ID)
 );

@@ -25,6 +25,8 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final BoardBadReportRepository boardBadReportRepository;
     private final BoardScrapRepository boardScrapRepository;
+    private final BoardBookmarkRepository boardBookmarkRepository;
+    private final BoardCommentRepository boardCommentRepository;
     private final UserRepository userRepository;
 
     BoardType getByName(String boardName) {
@@ -331,5 +333,94 @@ public class BoardService {
         boardScrapRepository.delete(boardScrap);
 
         return ServiceResult.success();
+    }
+
+    public ServiceResult boardBookmarkList(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        User user = optionalUser.get();
+
+        List<BoardBookmark> boardBookmarkList = boardBookmarkRepository.findByUser(user);
+        List<BoardBookmarkResponse> resultList = new ArrayList<>();
+
+        boardBookmarkList.stream().forEach(e -> {
+            resultList.add(BoardBookmarkResponse.of(e));
+        });
+
+        return ServiceResult.success(resultList);
+    }
+
+    public ServiceResult addBookmark(Long id, String email) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            return ServiceResult.fail("게시글이 존재하지 않습니다.");
+        }
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Board board = optionalBoard.get();
+        User user = optionalUser.get();
+
+        if(boardBookmarkRepository.countByBoardAndUser(board, user) > 0) {
+            return ServiceResult.fail("이미 북마크한 게시글입니다.");
+        }
+
+        boardBookmarkRepository.save(BoardBookmark.builder()
+                .board(board)
+                .user(user)
+                .regDate(LocalDateTime.now())
+                .build());
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult removeBookmark(Long id, String email) {
+        Optional<BoardBookmark> optionalBoardBookmark = boardBookmarkRepository.findById(id);
+        if(!optionalBoardBookmark.isPresent()) {
+            return ServiceResult.fail("북마크 내역이 존재하지 않습니다.");
+        }
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        BoardBookmark boardBookmark = optionalBoardBookmark.get();
+        User user = optionalUser.get();
+
+        if(boardBookmark.getUser().getId() != user.getId()) {
+            return ServiceResult.fail("사용자가 북마크한 글이 아닙니다.");
+        }
+
+        boardBookmarkRepository.delete(boardBookmark);
+
+        return ServiceResult.success();
+    }
+
+    public ServiceResult postList(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        User user = optionalUser.get();
+
+        return ServiceResult.success(boardRepository.findByUser(user));
+    }
+
+    public ServiceResult commentList(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        User user = optionalUser.get();
+
+        return ServiceResult.success(boardCommentRepository.findByUser(user));
     }
 }
