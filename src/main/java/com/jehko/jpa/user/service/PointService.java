@@ -1,10 +1,9 @@
 package com.jehko.jpa.user.service;
 
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.entity.UserPoint;
 import com.jehko.jpa.user.model.UserPointInput;
-import com.jehko.jpa.user.model.UserPointType;
 import com.jehko.jpa.user.repository.UserPointRepository;
 import com.jehko.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

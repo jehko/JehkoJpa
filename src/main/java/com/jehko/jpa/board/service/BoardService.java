@@ -3,12 +3,12 @@ package com.jehko.jpa.board.service;
 import com.jehko.jpa.board.entity.*;
 import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.repository.*;
+import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

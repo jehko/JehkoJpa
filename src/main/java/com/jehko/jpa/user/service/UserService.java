@@ -1,18 +1,16 @@
 package com.jehko.jpa.user.service;
 
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.common.exception.BizException;
+import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.entity.UserInterest;
-import com.jehko.jpa.user.model.UserNoticeCount;
-import com.jehko.jpa.user.model.UserNoticeLogCount;
-import com.jehko.jpa.user.model.UserStatus;
-import com.jehko.jpa.user.model.UserSummary;
+import com.jehko.jpa.user.model.*;
 import com.jehko.jpa.user.repository.UserCustomRepository;
 import com.jehko.jpa.user.repository.UserInterestRepository;
 import com.jehko.jpa.user.repository.UserRepository;
+import com.jehko.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -111,5 +109,19 @@ public class UserService {
         userInterestRepository.delete(userInterest);
 
         return ServiceResult.success();
+    }
+
+    public User login(UserLogin userLogin) {
+        Optional<User> optionalUser = userRepository.findByEmail(userLogin.getEmail());
+        if(!optionalUser.isPresent()) {
+            throw new BizException("회원 정보가 존재하지 않습니다.");
+        }
+
+        User user = optionalUser.get();
+        if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
+            throw new BizException("회원 정보가 일치하지 않습니다.");
+        }
+
+        return user;
     }
 }

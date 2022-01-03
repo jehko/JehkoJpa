@@ -1,15 +1,10 @@
-package com.jehko.jpa.user.model;
+package com.jehko.jpa.common.model;
 
-import com.jehko.jpa.notice.model.ResponseError;
-import com.jehko.jpa.user.entity.User;
-import com.sun.net.httpserver.HttpsServer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 @Data
 @Builder

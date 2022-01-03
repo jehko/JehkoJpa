@@ -1,12 +1,13 @@
 package com.jehko.jpa.user.controller;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.board.service.BoardService;
+import com.jehko.jpa.common.model.ResponseMessage;
 import com.jehko.jpa.notice.entity.Notice;
 import com.jehko.jpa.notice.entity.NoticeLike;
 import com.jehko.jpa.notice.model.NoticeResponse;
-import com.jehko.jpa.notice.model.ResponseError;
+import com.jehko.jpa.common.model.ResponseError;
 import com.jehko.jpa.notice.repository.NoticeLikeRepository;
 import com.jehko.jpa.notice.repository.NoticeRepository;
 import com.jehko.jpa.user.entity.User;
@@ -213,49 +214,27 @@ public class ApiUserController {
 		List<NoticeLike> noticeLikeList = noticeLikeRepository.findByUser(user);
 		return noticeLikeList;
 	}
-	
-	@PostMapping("/api/user/login")
-	public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors) {
-		List<ResponseError> responseErrors = new ArrayList<>();
 
-		if (errors.hasErrors()) {
-			errors.getAllErrors().forEach((e) -> {
-				responseErrors.add(ResponseError.of((FieldError) e));
-			});
-
-			return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-		}
-
-		User user = userRepository.findByEmail(userLogin.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
-		
-		if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
-			throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
-		}
-
-		String token = JWTUtils.createToken(user);
-		
-		return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
-	}
 	
 	@PatchMapping("/api/user/login")
 	public ResponseEntity<?> refreshToken(@RequestHeader("J_TOKEN") String token) {
-		String email = "";
-
-		try {
-			email = JWTUtils.getIssuer(token);
-		} catch (SignatureVerificationException e) {
-			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
-		} catch (Exception e) {
-			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
-		}
-
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
-
-		String newToken = JWTUtils.createToken(user);
-
-		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
+//		String email = "";
+//
+//		try {
+//			email = JWTUtils.getIssuer(token);
+//		} catch (SignatureVerificationException e) {
+//			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+//		} catch (Exception e) {
+//			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+//		}
+//
+//		User user = userRepository.findByEmail(email)
+//				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+//
+//		String newToken = JWTUtils.createToken(user);
+//
+//		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
+		return null;
 	}
 
 	@DeleteMapping("/api/user/login")

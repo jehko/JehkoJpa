@@ -1,4 +1,4 @@
-package com.jehko.jpa.board.model;
+package com.jehko.jpa.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,5 +32,9 @@ public class ServiceResult {
                 .result(true)
                 .data(data)
                 .build();
+    }
+
+    public boolean isFail() {
+        return !result;
     }
 }

@@ -1,9 +1,9 @@
 package com.jehko.jpa.board.controller;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.jehko.jpa.board.model.ServiceResult;
+import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.board.service.BoardService;
-import com.jehko.jpa.user.model.ResponseMessage;
+import com.jehko.jpa.common.model.ResponseMessage;
 import com.jehko.jpa.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

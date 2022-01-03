@@ -1,10 +1,8 @@
 package com.jehko.jpa.board.controller;
 
-import com.jehko.jpa.board.entity.BoardBadReport;
 import com.jehko.jpa.board.model.BoardBadReportResponse;
 import com.jehko.jpa.board.service.BoardService;
-import com.jehko.jpa.user.model.ResponseMessage;
-import com.jehko.jpa.user.service.UserService;
+import com.jehko.jpa.common.model.ResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
