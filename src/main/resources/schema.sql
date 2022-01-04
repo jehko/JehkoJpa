@@ -175,3 +175,11 @@ create table BOARD_BOOKMARK
 	constraint FK_BOARD_BOOKMARK_BOARD_ID foreign key(BOARD_ID) references BOARD(ID),
 	constraint FK_BOARD_BOOKMARK_USER_ID foreign key(USER_ID) references USER(ID)
 );
+
+create table LOGS
+(
+    ID      BIGINT auto_increment primary key,
+    PATH    VARCHAR(255),
+    USER_ID BIGINT,
+    REG_DATE    TIMESTAMP
+);

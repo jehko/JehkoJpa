@@ -8,6 +8,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 
 @Slf4j
 @Aspect
@@ -19,11 +25,20 @@ public class LoginLogger {
     @Around("execution(* com.jehko.jpa..*.*Service*.*(..))")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        log.info("before logging");
-
         Object result = joinPoint.proceed();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        log.info("after logging");
+        StringBuilder sb = new StringBuilder();
+        sb.append(joinPoint.getSignature().getName());
+        Object[] args = joinPoint.getArgs();
+        if(args != null && args.length > 0) {
+            for(Object arg : args) {
+                sb.append("\n");
+                sb.append(arg.toString());
+            }
+        }
+        log.info(sb.toString());
+        log.info("{} {}", request.getMethod(), request.getRequestURI());
 
         return result;
     }
