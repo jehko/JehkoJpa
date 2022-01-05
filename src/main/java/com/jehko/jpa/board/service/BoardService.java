@@ -3,6 +3,7 @@ package com.jehko.jpa.board.service;
 import com.jehko.jpa.board.entity.*;
 import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.repository.*;
+import com.jehko.jpa.common.exception.BizException;
 import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.repository.UserRepository;
@@ -422,5 +423,14 @@ public class BoardService {
         User user = optionalUser.get();
 
         return ServiceResult.success(boardCommentRepository.findByUser(user));
+    }
+
+    public Board detail(Long id) {
+        Optional<Board> optionalBoard = boardRepository.findById(id);
+        if(!optionalBoard.isPresent()) {
+            throw new BizException("게시글이 존재하지 않습니다.");
+        }
+
+        return optionalBoard.get();
     }
 }

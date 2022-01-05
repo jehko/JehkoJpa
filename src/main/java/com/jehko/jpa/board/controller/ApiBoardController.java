@@ -1,11 +1,14 @@
 package com.jehko.jpa.board.controller;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.jehko.jpa.board.entity.Board;
 import com.jehko.jpa.board.entity.BoardType;
 import com.jehko.jpa.board.model.*;
 import com.jehko.jpa.board.service.BoardService;
+import com.jehko.jpa.common.exception.BizException;
 import com.jehko.jpa.common.model.ResponseError;
 import com.jehko.jpa.common.model.ResponseMessage;
+import com.jehko.jpa.common.model.ResponseResult;
 import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
@@ -91,6 +94,18 @@ public class ApiBoardController {
 		List<BoardTypeCount> boardTypeCountList = boardService.getBoardTypeCount();
 
 		return ResponseEntity.ok().body(ResponseMessage.success(boardTypeCountList));
+	}
+
+	@GetMapping("/api/board/{id}")
+	public ResponseEntity<?> detail(@PathVariable Long id) {
+		Board board = null;
+		try {
+			board = boardService.detail(id);
+		} catch(BizException e) {
+			return ResponseResult.fail(e.getMessage());
+		}
+
+		return ResponseResult.success(board);
 	}
 
 	@PatchMapping("/api/board/{id}/top")
