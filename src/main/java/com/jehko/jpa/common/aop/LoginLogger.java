@@ -29,16 +29,14 @@ public class LoginLogger {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(joinPoint.getSignature().getName());
         Object[] args = joinPoint.getArgs();
         if(args != null && args.length > 0) {
             for(Object arg : args) {
-                sb.append("\n");
                 sb.append(arg.toString());
             }
         }
         log.info(sb.toString());
-        log.info("{} {}", request.getMethod(), request.getRequestURI());
+        log.info("{} {} {} {}", sb.toString(), joinPoint.getSignature().getName(), request.getMethod(), request.getRequestURI());
 
         return result;
     }

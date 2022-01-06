@@ -12,6 +12,7 @@ import com.jehko.jpa.user.service.UserService;
 import com.jehko.jpa.util.JWTUtils;
 import com.jehko.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ApiLoginController {
@@ -39,11 +41,13 @@ public class ApiLoginController {
 		try {
 			user = userService.login(userLogin);
 		} catch(BizException e) {
+			log.info("Login failed: {}", e.getMessage());
 			return ResponseResult.fail(e.getMessage());
 		}
 
 		UserLoginToken userLoginToken = JWTUtils.createToken(user);
 		if(userLoginToken == null) {
+			log.info("create JWT Failed!!");
 			return ResponseResult.fail("회원 정보가 존재하지 않습니다.");
 		}
 		
