@@ -8,6 +8,8 @@ import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BoardService {
+    private static final int PAGE_SIZE = 10;
 
     private final BoardTypeRepository boardTypeRepository;
     private final BoardRepository boardRepository;
@@ -432,5 +435,35 @@ public class BoardService {
         }
 
         return optionalBoard.get();
+    }
+
+    public Page<Board> getBoardList(int page) {
+        return boardRepository.findAll(PageRequest.of(page, PAGE_SIZE));
+    }
+
+    public ServiceResult add(String email, BoardInput boardInput) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(!optionalUser.isPresent()) {
+            return ServiceResult.fail("사용자 정보가 존재하지 않습니다.");
+        }
+
+        Optional<BoardType> optionalBoardType = boardTypeRepository.findById(boardInput.getBoardType());
+        if(!optionalBoardType.isPresent()) {
+            return ServiceResult.fail("게시판 정보가 존재하지 않습니다.");
+        }
+        User user = optionalUser.get();
+        BoardType boardType = optionalBoardType.get();
+
+        Board board = Board.builder()
+                .user(user)
+                .boardType(boardType)
+                .title(boardInput.getTitle())
+                .contents(boardInput.getContents())
+                .regDate(LocalDateTime.now())
+                .build();
+
+        boardRepository.save(board);
+
+        return ServiceResult.success();
     }
 }

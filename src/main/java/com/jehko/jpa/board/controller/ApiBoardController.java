@@ -12,6 +12,7 @@ import com.jehko.jpa.common.model.ResponseResult;
 import com.jehko.jpa.common.model.ServiceResult;
 import com.jehko.jpa.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -94,6 +95,30 @@ public class ApiBoardController {
 		List<BoardTypeCount> boardTypeCountList = boardService.getBoardTypeCount();
 
 		return ResponseEntity.ok().body(ResponseMessage.success(boardTypeCountList));
+	}
+
+	@PostMapping("/api/board")
+	public ResponseEntity<?> add(@RequestHeader("J_TOKEN") String token, @RequestBody BoardInput boardInput) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.add(email, boardInput);
+
+		return ResponseResult.result(result);
+	}
+
+	@GetMapping("/api/board/list/{page}")
+	public ResponseEntity<?> boardList(@PathVariable int page) {
+		Page<Board> boardList = boardService.getBoardList(page);
+
+		return ResponseResult.success(boardList);
 	}
 
 	@GetMapping("/api/board/{id}")
