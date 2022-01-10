@@ -30,7 +30,7 @@ public class ApiLoginController {
 
 	private final UserService userService;
 	
-	@PostMapping("/api/login")
+	@PostMapping("/api/public/login")
 	public ResponseEntity<?> login(@RequestBody @Valid UserLogin userLogin, Errors errors) {
 		if (errors.hasErrors()) {
 			return ResponseResult.fail("입력값이 정확하지 않습니다.", ResponseError.of(errors.getAllErrors()));

@@ -53,7 +53,7 @@ public class ApiUserController {
 		return bCryptPasswordEncoder.encode(password);
 	}
 	
-	@PostMapping("/api/user")
+	@PostMapping("/api/public/user")
 	public ResponseEntity<?> addUser(@RequestBody @Valid UserInput userInput, Errors errors) {
 		List<ResponseError> responseErrors = new ArrayList<>();
 
@@ -77,6 +77,10 @@ public class ApiUserController {
 				.regDate(LocalDateTime.now()).build();
 
 		userRepository.save(user);
+
+		mailService.sendMail("관리자",
+				"jehko08@naver.com", userInput.getUserName(),
+				"회원 가입을 축하합니다.", userInput.getUserName() + "님의 회원 가입을 축하합니다.");
 
 		return ResponseEntity.ok().build();
 	}
@@ -198,7 +202,7 @@ public class ApiUserController {
 		userRepository.save(user);
 		
 //		mailService.sendMail(user.getEmail(), "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
-		mailService.sendMail("jehko08@naver.com", "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
+		mailService.sendSimpleMail("jehko08@naver.com", "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
 		
 		return ResponseEntity.ok().build();
 	}
