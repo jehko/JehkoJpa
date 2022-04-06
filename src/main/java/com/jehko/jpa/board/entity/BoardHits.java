@@ -1,5 +1,6 @@
 package com.jehko.jpa.board.entity;
 
+import com.jehko.jpa.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,21 +14,19 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardType {
-
+public class BoardHits {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column
-	private String boardName;
+	@ManyToOne
+	@JoinColumn
+	private User user;
+
+	@ManyToOne
+	@JoinColumn
+	private Board board;
 
 	@Column
 	private LocalDateTime regDate;
-
-	@Column
-	private LocalDateTime updateDate;
-
-	@Column
-	private boolean usingYn;
 }

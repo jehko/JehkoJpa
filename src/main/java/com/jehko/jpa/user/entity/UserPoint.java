@@ -1,5 +1,6 @@
-package com.jehko.jpa.board.entity;
+package com.jehko.jpa.user.entity;
 
+import com.jehko.jpa.user.model.UserPointType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,26 +9,25 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Builder
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardType {
-
+@Builder
+@Data
+@Entity
+public class UserPoint {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@ManyToOne
+	@JoinColumn
+	private User user;
+
+	@Enumerated(EnumType.STRING)
 	@Column
-	private String boardName;
+	private UserPointType userPointType;
 
 	@Column
-	private LocalDateTime regDate;
+	private int point;
 
-	@Column
-	private LocalDateTime updateDate;
-
-	@Column
-	private boolean usingYn;
 }

@@ -1,5 +1,6 @@
 package com.jehko.jpa.user.controller;
 
+import com.jehko.jpa.common.model.ResponseMessage;
 import com.jehko.jpa.notice.repository.NoticeRepository;
 import com.jehko.jpa.user.entity.User;
 import com.jehko.jpa.user.entity.UserLoginHistory;

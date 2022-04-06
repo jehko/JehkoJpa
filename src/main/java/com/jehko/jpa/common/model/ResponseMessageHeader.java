@@ -1,4 +1,4 @@
-package com.jehko.jpa.user.model;
+package com.jehko.jpa.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

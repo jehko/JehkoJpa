@@ -30,7 +30,7 @@ import com.jehko.jpa.notice.exception.DuplicateNoticeException;
 import com.jehko.jpa.notice.exception.NoticeNotFoundException;
 import com.jehko.jpa.notice.model.NoticeDeleteInput;
 import com.jehko.jpa.notice.model.NoticeInput;
-import com.jehko.jpa.notice.model.ResponseError;
+import com.jehko.jpa.common.model.ResponseError;
 import com.jehko.jpa.notice.repository.NoticeRepository;
 
 import io.swagger.v3.oas.annotations.Operation;

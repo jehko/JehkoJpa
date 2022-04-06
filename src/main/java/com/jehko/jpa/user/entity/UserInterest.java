@@ -1,4 +1,4 @@
-package com.jehko.jpa.board.entity;
+package com.jehko.jpa.user.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,26 +8,24 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Builder
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardType {
-
+@Builder
+@Data
+@Entity
+public class UserInterest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@Column
-	private String boardName;
+	@ManyToOne
+	@JoinColumn
+	private User user;
+
+	@ManyToOne
+	@JoinColumn
+	private User interestUser;
 
 	@Column
 	private LocalDateTime regDate;
-
-	@Column
-	private LocalDateTime updateDate;
-
-	@Column
-	private boolean usingYn;
 }

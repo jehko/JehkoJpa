@@ -1,19 +1,27 @@
 package com.jehko.jpa.user.controller;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.jehko.jpa.common.model.ServiceResult;
+import com.jehko.jpa.board.service.BoardService;
+import com.jehko.jpa.common.model.ResponseMessage;
+import com.jehko.jpa.notice.entity.Notice;
+import com.jehko.jpa.notice.entity.NoticeLike;
+import com.jehko.jpa.notice.model.NoticeResponse;
+import com.jehko.jpa.common.model.ResponseError;
+import com.jehko.jpa.notice.repository.NoticeLikeRepository;
+import com.jehko.jpa.notice.repository.NoticeRepository;
+import com.jehko.jpa.user.entity.User;
+import com.jehko.jpa.user.exception.ExistEmailException;
+import com.jehko.jpa.user.exception.PasswordNotMatchException;
+import com.jehko.jpa.user.exception.UserNotFoundException;
+import com.jehko.jpa.user.model.*;
+import com.jehko.jpa.user.repository.UserRepository;
+import com.jehko.jpa.user.service.PointService;
+import com.jehko.jpa.user.service.UserService;
 import com.jehko.jpa.util.JWTUtils;
+import com.jehko.jpa.util.MailService;
+import com.jehko.jpa.util.PasswordUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,30 +30,11 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.jehko.jpa.notice.entity.Notice;
-import com.jehko.jpa.notice.entity.NoticeLike;
-import com.jehko.jpa.notice.model.NoticeResponse;
-import com.jehko.jpa.notice.model.ResponseError;
-import com.jehko.jpa.notice.repository.NoticeLikeRepository;
-import com.jehko.jpa.notice.repository.NoticeRepository;
-import com.jehko.jpa.user.entity.User;
-import com.jehko.jpa.user.exception.ExistEmailException;
-import com.jehko.jpa.user.exception.PasswordNotMatchException;
-import com.jehko.jpa.user.exception.UserNotFoundException;
-import com.jehko.jpa.user.model.UserInput;
-import com.jehko.jpa.user.model.UserInputFind;
-import com.jehko.jpa.user.model.UserInputPassword;
-import com.jehko.jpa.user.model.UserLogin;
-import com.jehko.jpa.user.model.UserLoginToken;
-import com.jehko.jpa.user.model.UserResponse;
-import com.jehko.jpa.user.model.UserUpdate;
-import com.jehko.jpa.user.repository.UserRepository;
-import com.jehko.jpa.util.MailService;
-import com.jehko.jpa.util.PasswordUtils;
-
-import lombok.RequiredArgsConstructor;
+import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -55,13 +44,16 @@ public class ApiUserController {
 	private final NoticeRepository noticeRepository;
 	private final NoticeLikeRepository noticeLikeRepository;
 	private final MailService mailService;
+	private final UserService userService;
+	private final BoardService boardService;
+	private final PointService pointService;
 
 	private String getEncryptPassword(String password) {
 		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 		return bCryptPasswordEncoder.encode(password);
 	}
 	
-	@PostMapping("/api/user")
+	@PostMapping("/api/public/user")
 	public ResponseEntity<?> addUser(@RequestBody @Valid UserInput userInput, Errors errors) {
 		List<ResponseError> responseErrors = new ArrayList<>();
 
@@ -85,6 +77,10 @@ public class ApiUserController {
 				.regDate(LocalDateTime.now()).build();
 
 		userRepository.save(user);
+
+		mailService.sendMail("관리자",
+				"jehko08@naver.com", userInput.getUserName(),
+				"회원 가입을 축하합니다.", userInput.getUserName() + "님의 회원 가입을 축하합니다.");
 
 		return ResponseEntity.ok().build();
 	}
@@ -206,7 +202,7 @@ public class ApiUserController {
 		userRepository.save(user);
 		
 //		mailService.sendMail(user.getEmail(), "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
-		mailService.sendMail("jehko08@naver.com", "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
+		mailService.sendSimpleMail("jehko08@naver.com", "패스워드 초기화 안내", "패스워드가 " + initPassword + "로 초기화 되었습니다.");
 		
 		return ResponseEntity.ok().build();
 	}
@@ -222,49 +218,27 @@ public class ApiUserController {
 		List<NoticeLike> noticeLikeList = noticeLikeRepository.findByUser(user);
 		return noticeLikeList;
 	}
-	
-	@PostMapping("/api/user/login")
-	public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors) {
-		List<ResponseError> responseErrors = new ArrayList<>();
 
-		if (errors.hasErrors()) {
-			errors.getAllErrors().forEach((e) -> {
-				responseErrors.add(ResponseError.of((FieldError) e));
-			});
-
-			return new ResponseEntity<>(responseErrors, HttpStatus.BAD_REQUEST);
-		}
-
-		User user = userRepository.findByEmail(userLogin.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
-		
-		if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())) {
-			throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
-		}
-
-		String token = JWTUtils.createToken(user);
-		
-		return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
-	}
 	
 	@PatchMapping("/api/user/login")
 	public ResponseEntity<?> refreshToken(@RequestHeader("J_TOKEN") String token) {
-		String email = "";
-
-		try {
-			email = JWTUtils.getIssuer(token);
-		} catch (SignatureVerificationException e) {
-			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
-		} catch (Exception e) {
-			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
-		}
-
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
-
-		String newToken = JWTUtils.createToken(user);
-
-		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
+//		String email = "";
+//
+//		try {
+//			email = JWTUtils.getIssuer(token);
+//		} catch (SignatureVerificationException e) {
+//			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+//		} catch (Exception e) {
+//			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+//		}
+//
+//		User user = userRepository.findByEmail(email)
+//				.orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+//
+//		String newToken = JWTUtils.createToken(user);
+//
+//		return ResponseEntity.ok().body(UserLoginToken.builder().token(newToken).build());
+		return null;
 	}
 
 	@DeleteMapping("/api/user/login")
@@ -287,6 +261,110 @@ public class ApiUserController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PutMapping("/api/user/{id}/interest")
+	public ResponseEntity<?> interestUser(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = userService.addInterestUser(id, email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@DeleteMapping("/api/user/{id}/interest")
+	public ResponseEntity<?> removeInterestUser(@PathVariable Long id, @RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = userService.removeInterestUser(id, email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
+
+	@GetMapping("/api/user/board/mypost")
+	public ResponseEntity<?> myPost(@RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.postList(email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success(result));
+	}
+
+	@GetMapping("/api/user/board/mycomment")
+	public ResponseEntity<?> myComment(@RequestHeader("J_TOKEN") String token) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = boardService.commentList(email);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success(result));
+	}
+
+	@PostMapping("/api/user/point")
+	public ResponseEntity<?> userPoint(@RequestHeader("J_TOKEN") String token, @RequestBody UserPointInput userPointInput) {
+		String email = "";
+
+		try {
+			email = JWTUtils.getIssuer(token);
+		} catch(SignatureVerificationException e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("토큰 정보가 정확하지 않습니다.", HttpStatus.BAD_REQUEST);
+		}
+
+		ServiceResult result = pointService.addPoint(email, userPointInput);
+
+		if (!result.isResult()) {
+			return ResponseEntity.ok().body(ResponseMessage.fail(result.getMessage()));
+		}
+
+		return ResponseEntity.ok().body(ResponseMessage.success());
+	}
 
 	@ExceptionHandler(value = { ExistEmailException.class, PasswordNotMatchException.class,
 			UserNotFoundException.class })

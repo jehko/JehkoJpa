@@ -1,11 +1,13 @@
 package com.jehko.jpa.board.entity;
 
+import com.jehko.jpa.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,21 +15,33 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardType {
-
+public class BoardBadReport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@ManyToOne
+	@JoinColumn
+	private User user;
+
 	@Column
-	private String boardName;
+	private String comments;
+
+	@Column
+	private long boardId;
+
+	@Column
+	private long boardUserId;
+
+	@Column
+	private String boardTitle;
+
+	@Column
+	private String boardContents;
+
+	@Column
+	private LocalDateTime boardRegDate;
 
 	@Column
 	private LocalDateTime regDate;
-
-	@Column
-	private LocalDateTime updateDate;
-
-	@Column
-	private boolean usingYn;
 }
