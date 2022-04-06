@@ -5,4 +5,4 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
-rootProject.name = 'JPASample'
+rootProject.name = 'JehkoJpa'
